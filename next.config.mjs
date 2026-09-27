@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: "standalone",
   reactStrictMode: true,
   poweredByHeader: false,
   experimental: {
@@ -9,6 +10,9 @@ const nextConfig = {
       "@aws-sdk/client-s3",
       "@aws-sdk/s3-request-presigner",
     ],
+    outputFileTracingIncludes: {
+      "/**": ["./node_modules/.prisma/client/**/*"],
+    },
   },
 };
 
