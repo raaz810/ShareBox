@@ -1,0 +1,249 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                  String               @id @default(uuid())
+  email               String               @unique
+  name                String?
+  passwordHash        String
+  role                UserRole             @default(USER)
+  isActive            Boolean              @default(true)
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  auditLogs           AuditLog[]
+  permissions         FolderPermission[]
+  folders             Folder[]
+  passwordResetTokens PasswordResetToken[]
+
+  @@index([email])
+  @@index([createdAt])
+  @@map("users")
+}
+
+model Folder {
+  id                 String             @id @default(uuid())
+  userId             String?
+  folderCode         String             @unique
+  folderName         String
+  description        String?
+  ownershipTokenHash String
+  passwordHash       String?
+  visibility         FolderVisibility   @default(PUBLIC)
+  allowDownload      Boolean            @default(true)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  expiresAt          DateTime
+  deletedAt          DateTime?
+  // Lifecycle (Part 7): ACTIVE -> EXPIRED/DELETED (access blocked) -> row purged by cleanup
+  status              FolderStatus       @default(ACTIVE)
+  expiredAt           DateTime?
+  purgeAttempts       Int                @default(0)
+  lastPurgeError      String?
+  nextPurgeAttemptAt  DateTime?
+  expiryWarningSentAt DateTime?
+  totalSize          BigInt             @default(0)
+  fileCount          Int                @default(0)
+  auditLogs          AuditLog[]
+  files              File[]
+  permissions        FolderPermission[]
+  user               User?              @relation(fields: [userId], references: [id])
+  uploadSessions     UploadSession[]
+
+  @@index([folderCode])
+  @@index([expiresAt])
+  @@index([userId])
+  @@index([deletedAt])
+  @@index([createdAt])
+  @@index([status, nextPurgeAttemptAt])
+  @@map("folders")
+}
+
+model File {
+  id               String       @id @default(uuid())
+  folderId         String
+  originalFileName String
+  storageKey       String       @unique
+  mimeType         String
+  fileSize         BigInt
+  checksum         String?
+  uploadStatus     UploadStatus @default(PENDING)
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  deletedAt        DateTime?
+  // Storage purge retry tracking: the row is kept until every storage object is gone
+  purgeAttempts      Int          @default(0)
+  lastPurgeError     String?
+  nextPurgeAttemptAt DateTime?
+  folder           Folder       @relation(fields: [folderId], references: [id], onDelete: Cascade)
+
+  @@index([folderId])
+  @@index([uploadStatus])
+  @@index([deletedAt])
+  @@index([createdAt])
+  @@map("files")
+}
+
+model FolderPermission {
+  id         String         @id @default(uuid())
+  folderId   String
+  userId     String?
+  email      String?
+  permission PermissionType @default(VIEW)
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+  folder     Folder         @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  user       User?          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([folderId, userId])
+  @@index([folderId])
+  @@index([userId])
+  @@index([email])
+  @@map("folder_permissions")
+}
+
+model UploadSession {
+  id                 String        @id @default(uuid())
+  folderId           String
+  sessionToken       String        @unique
+  totalFilesExpected Int           @default(1)
+  totalBytesExpected BigInt        @default(0)
+  status             SessionStatus @default(INITIATED)
+  expiresAt          DateTime
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+  folder             Folder        @relation(fields: [folderId], references: [id], onDelete: Cascade)
+
+  @@index([folderId])
+  @@index([sessionToken])
+  @@index([expiresAt])
+  @@map("upload_sessions")
+}
+
+model PasswordResetToken {
+  id        String    @id @default(uuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([tokenHash])
+  @@index([expiresAt])
+  @@map("password_reset_tokens")
+}
+
+model CleanupJob {
+  id              String           @id @default(uuid())
+  jobType         String
+  status          CleanupJobStatus @default(PENDING)
+  // Held ("GLOBAL") only while RUNNING; the unique index makes concurrent runs impossible
+  lockKey         String?          @unique
+  // Caller-supplied key (e.g. cron tick id): a retried trigger reuses the same job record
+  idempotencyKey  String?          @unique
+  attempts        Int              @default(1)
+  triggeredBy     String?
+  itemsProcessed  Int              @default(0)
+  foldersExpired  Int              @default(0)
+  foldersPurged   Int              @default(0)
+  filesPurged     Int              @default(0)
+  failedDeletions Int              @default(0)
+  bytesReclaimed  BigInt           @default(0)
+  errorMessage    String?
+  metadata        String?
+  startedAt       DateTime?
+  completedAt     DateTime?
+  createdAt       DateTime         @default(now())
+
+  @@index([status])
+  @@index([jobType])
+  @@index([createdAt])
+  @@map("cleanup_jobs")
+}
+
+model SystemSetting {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  value       String
+  description String?
+  isPublic    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([key])
+  @@map("system_settings")
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  folderId  String?
+  action    String
+  ipAddress String?
+  userAgent String?
+  metadata  String?
+  createdAt DateTime @default(now())
+  folder    Folder?  @relation(fields: [folderId], references: [id])
+  user      User?    @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([folderId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum FolderVisibility {
+  PUBLIC
+  PASSWORD_PROTECTED
+  PRIVATE
+}
+
+enum UploadStatus {
+  PENDING
+  UPLOADING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum SessionStatus {
+  INITIATED
+  ACTIVE
+  COMPLETED
+  EXPIRED
+  ABORTED
+}
+
+enum PermissionType {
+  VIEW
+  DOWNLOAD
+  UPLOAD
+  MANAGE
+}
+
+enum CleanupJobStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  PARTIAL
+  FAILED
+}
+
+enum FolderStatus {
+  ACTIVE
+  EXPIRED
+  DELETED
+}

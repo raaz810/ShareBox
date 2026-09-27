@@ -1,0 +1,51 @@
+{
+  "name": "sharebox",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate deploy",
+    "prisma:migrate:dev": "prisma migrate dev",
+    "prisma:studio": "prisma studio",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "seed:admin": "node scripts/seed-admin.js"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.1139.0",
+    "@aws-sdk/s3-request-presigner": "^3.1139.0",
+    "@prisma/client": "^5.21.1",
+    "archiver": "^8.0.0",
+    "bcryptjs": "^3.0.3",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
+    "jose": "^6.2.12",
+    "lucide-react": "^0.453.0",
+    "next": "14.2.15",
+    "next-themes": "^0.3.0",
+    "qrcode": "^1.5.4",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwind-merge": "^2.5.4"
+  },
+  "devDependencies": {
+    "@types/archiver": "^8.0.0",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^20.17.0",
+    "@types/qrcode": "^1.5.6",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^8.57.1",
+    "eslint-config-next": "14.2.15",
+    "postcss": "^8.4.47",
+    "prisma": "^5.21.1",
+    "tailwindcss": "^3.4.14",
+    "typescript": "^5.6.3",
+    "vitest": "^3.2.7"
+  }
+}
