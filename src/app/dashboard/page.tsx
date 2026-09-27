@@ -27,6 +27,7 @@ import { useAuth } from "@/lib/auth-context";
 import { useToast } from "@/components/ui/toast";
 import { QrModal } from "@/components/folder/qr-modal";
 import { ShareModal } from "@/components/folder/share-modal";
+import { AppLoader } from "@/components/ui/loader";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -182,7 +183,12 @@ export default function DashboardPage() {
   };
 
   if (authLoading || (loading && !stats)) {
-    return <DashboardSkeleton />;
+    return (
+      <AppLoader 
+        title="Loading Dashboard" 
+        subtitle="Analyzing ephemeral storage and active folders..." 
+      />
+    );
   }
 
   if (!isAuthenticated) {

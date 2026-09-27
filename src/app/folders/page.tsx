@@ -35,6 +35,7 @@ import { useToast } from "@/components/ui/toast";
 import { QrModal } from "@/components/folder/qr-modal";
 import { ShareModal } from "@/components/folder/share-modal";
 import { PrivacyModal } from "@/components/folder/privacy-modal";
+import { AppLoader } from "@/components/ui/loader";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -280,9 +281,10 @@ export default function FoldersPage() {
 
   if (authLoading) {
     return (
-      <div className="flex min-h-[calc(100vh-14rem)] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-      </div>
+      <AppLoader 
+        title="Loading Folders" 
+        subtitle="Retrieving your active folders and shares..." 
+      />
     );
   }
 
@@ -565,10 +567,11 @@ export default function FoldersPage() {
 
       {/* ── Folders Display ── */}
       {loading ? (
-        <div className="flex flex-col items-center justify-center p-16">
-          <Loader2 className="h-8 w-8 animate-spin text-blue-600 mb-2" />
-          <p className="text-xs text-slate-500">Loading your folders...</p>
-        </div>
+        <AppLoader 
+          variant="inline"
+          title="Loading Folders" 
+          subtitle="Fetching your latest folders and files..." 
+        />
       ) : folders.length === 0 ? (
         <Card className="border-dashed border-2 border-slate-200 dark:border-slate-800 p-12 text-center">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400 mb-3">

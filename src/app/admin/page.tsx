@@ -33,6 +33,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/lib/auth-context";
 import { useToast } from "@/components/ui/toast";
+import { AppLoader } from "@/components/ui/loader";
 
 // ─── Interfaces ──────────────────────────────────────────────────────────────
 
@@ -572,12 +573,10 @@ export default function AdminPage() {
 
   if (authLoading || (!user && isAuthenticated)) {
     return (
-      <div className="flex min-h-[calc(100vh-14rem)] items-center justify-center">
-        <div className="flex flex-col items-center gap-3">
-          <Loader2 className="h-9 w-9 animate-spin text-blue-600" />
-          <p className="text-sm font-medium text-slate-500">Verifying administrative access...</p>
-        </div>
-      </div>
+      <AppLoader 
+        title="Verifying Admin Access" 
+        subtitle="Authenticating your administrative privileges and session..." 
+      />
     );
   }
 

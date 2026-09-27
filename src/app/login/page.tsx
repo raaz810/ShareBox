@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { useAuth } from "@/lib/auth-context";
+import { AppLoader } from "@/components/ui/loader";
 
 function LoginForm() {
   const router = useRouter();
@@ -77,6 +78,15 @@ function LoginForm() {
       setLoading(false);
     }
   };
+
+  if (successMessage) {
+    return (
+      <AppLoader 
+        title="Signing You In..." 
+        subtitle="Redirecting you securely to your dashboard..." 
+      />
+    );
+  }
 
   return (
     <div className="flex min-h-[calc(100vh-14rem)] items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
@@ -228,9 +238,10 @@ function LoginForm() {
 export default function LoginPage() {
   return (
     <React.Suspense fallback={
-      <div className="flex min-h-[calc(100vh-14rem)] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-      </div>
+      <AppLoader 
+        title="Welcome to ShareBox" 
+        subtitle="Establishing secure session..." 
+      />
     }>
       <LoginForm />
     </React.Suspense>

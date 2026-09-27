@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { useAuth } from "@/lib/auth-context";
+import { AppLoader } from "@/components/ui/loader";
 import { evaluatePasswordStrength, PasswordStrengthResult } from "@/lib/auth";
 
 export default function SignupPage() {
@@ -130,6 +131,15 @@ export default function SignupPage() {
         return "bg-slate-200";
     }
   };
+
+  if (successMessage) {
+    return (
+      <AppLoader 
+        title="Account Created Successfully" 
+        subtitle="Setting up your secure workspace and redirecting..." 
+      />
+    );
+  }
 
   return (
     <div className="flex min-h-[calc(100vh-14rem)] items-center justify-center px-4 py-12 sm:px-6 lg:px-8">

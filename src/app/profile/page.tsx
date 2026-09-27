@@ -23,6 +23,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/lib/auth-context";
 import { useToast } from "@/components/ui/toast";
+import { AppLoader } from "@/components/ui/loader";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -172,9 +173,10 @@ export default function ProfilePage() {
 
   if (authLoading || (loading && !profileData)) {
     return (
-      <div className="flex min-h-[calc(100vh-14rem)] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-      </div>
+      <AppLoader 
+        title="Loading Profile" 
+        subtitle="Retrieving your account preferences and usage stats..." 
+      />
     );
   }
 

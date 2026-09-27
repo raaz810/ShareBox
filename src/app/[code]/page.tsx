@@ -19,6 +19,7 @@ import { QrModal } from "@/components/folder/qr-modal";
 import { ShareModal } from "@/components/folder/share-modal";
 import { PrivacyModal } from "@/components/folder/privacy-modal";
 import { useToast } from "@/components/ui/toast";
+import { AppLoader } from "@/components/ui/loader";
 import { ExpirationState, formatRemaining } from "@/lib/expiration-state";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -321,22 +322,10 @@ export default function FolderViewPage() {
   // 1. Loading
   if (loading) {
     return (
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-6">
-        <div className="flex items-center gap-2">
-          <div className="h-4 w-20 rounded bg-slate-200 dark:bg-slate-800 animate-pulse" />
-        </div>
-        <FolderHeaderSkeleton />
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 animate-pulse space-y-4">
-            <div className="h-32 rounded-3xl bg-slate-200 dark:bg-slate-800" />
-            <div className="h-64 rounded-3xl bg-slate-200 dark:bg-slate-800" />
-          </div>
-          <div className="animate-pulse space-y-4">
-            <div className="h-64 rounded-3xl bg-slate-200 dark:bg-slate-800" />
-            <div className="h-32 rounded-3xl bg-slate-200 dark:bg-slate-800" />
-          </div>
-        </div>
-      </div>
+      <AppLoader 
+        title={codeParam ? `Accessing Folder #${codeParam}` : "Accessing Folder"} 
+        subtitle="Retrieving folder contents, security policies, and active files..." 
+      />
     );
   }
 

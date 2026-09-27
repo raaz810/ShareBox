@@ -101,3 +101,15 @@
     linear-gradient(to right, rgba(30, 41, 59, 0.5) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(30, 41, 59, 0.5) 1px, transparent 1px);
 }
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(150%);
+  }
+  100% {
+    transform: translateX(300%);
+  }
+}
