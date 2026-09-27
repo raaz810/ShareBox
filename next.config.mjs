@@ -4,9 +4,14 @@ const nextConfig = {
   poweredByHeader: false,
   experimental: {
     serverComponentsExternalPackages: [
+      "@prisma/client",
+      "prisma",
       "@aws-sdk/client-s3",
       "@aws-sdk/s3-request-presigner",
     ],
+    outputFileTracingIncludes: {
+      "/*": ["./node_modules/.prisma/client/**/*"],
+    },
   },
 };
 
